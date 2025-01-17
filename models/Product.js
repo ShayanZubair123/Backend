@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Create the Rating schema
 const ratingSchema = new mongoose.Schema({
   rate: {
     type: Number,
@@ -15,7 +14,7 @@ const ratingSchema = new mongoose.Schema({
   }
 });
 
-// Create the Product schema
+
 const productSchema = new mongoose.Schema({
   id: {
     type: Number,

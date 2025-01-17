@@ -3,8 +3,7 @@ const Order = require('../models/Order');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 
-// Middleware to verify JWT
-const verifyJWT = (req, res, next) => {
+const verify_Account = (req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
     if (!authHeader) return res.status(401).json({ message: 'No token provided' });
@@ -19,8 +18,18 @@ const verifyJWT = (req, res, next) => {
     res.status(401).json({ message: 'Unauthorized access' });
   }
 };
-// POST /api/orders/checkout - Create a new order
-router.post('/checkout', verifyJWT, async (req, res) => {
+
+router.get('/GetAllOrders', async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+})
+
+
+router.post('/checkout', verify_Account, async (req, res) => {
   const { products, totalAmount, shippingAddress } = req.body;
 
   try {
@@ -38,8 +47,7 @@ router.post('/checkout', verifyJWT, async (req, res) => {
   }
 });
 
-// GET /api/orders/orders - Get orders of the logged-in user
-router.get('/orders', verifyJWT, async (req, res) => {
+router.get('/orders', verify_Account, async (req, res) => {
   try {
     const orders = await Order.find({ user: req.userId });
     res.status(200).json(orders);
@@ -47,11 +55,9 @@ router.get('/orders', verifyJWT, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-// DELETE /api/orders/:id - Delete an order by ID
-// DELETE /api/orders - Delete an order by ID (from body)
-router.delete('/orders', verifyJWT, async (req, res) => {
+router.delete('/orders', verify_Account, async (req, res) => {
   try {
-    const { orderId } = req.body; // Get the orderId from the request body
+    const { orderId } = req.body;
 
     if (!orderId) {
       return res.status(400).json({ success: false, message: 'Order ID is required.' });
@@ -68,7 +74,7 @@ router.delete('/orders', verifyJWT, async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error. Please try again later.' });
   }
 });
-router.put('/update-profile', verifyJWT, async (req, res) => {
+router.put('/update-profile', verify_Account, async (req, res) => {
   const { phone, profilePic } = req.body;
 
   try {

@@ -2,10 +2,10 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const JWT_SECRET = 'your_jwt_secret_key';
 const router = express.Router();
 
-// Middleware to verify JWT
-const verifyJWT = (req, res, next) => {
+const verify_Account = (req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
     if (!authHeader) return res.status(401).json({ message: 'No token provided' });
@@ -13,7 +13,7 @@ const verifyJWT = (req, res, next) => {
     const token = authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ message: 'No token provided' });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET); 
     req.userId = decoded.user._id;
     next();
   } catch (error) {
@@ -21,7 +21,6 @@ const verifyJWT = (req, res, next) => {
   }
 };
 
-// Register
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -33,14 +32,13 @@ router.post('/register', async (req, res) => {
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 
-    const token = jwt.sign({ user: newUser }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ user: newUser }, JWT_SECRET, { expiresIn: '1h' });
     res.status(201).json({ token });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -51,15 +49,14 @@ router.post('/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Update Profile
-router.put('/update-profile', verifyJWT, async (req, res) => {
+router.put('/update-profile', verify_Account , async (req, res) => {
   const { phone, ProfileImage } = req.body;
 
   try {
