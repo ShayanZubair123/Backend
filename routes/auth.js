@@ -13,7 +13,7 @@ const verify_Account = (req, res, next) => {
     const token = authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ message: 'No token provided' });
 
-    const decoded = jwt.verify(token, JWT_SECRET); 
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.user._id;
     next();
   } catch (error) {
@@ -56,7 +56,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.put('/update-profile', verify_Account , async (req, res) => {
+router.put('/update-profile', verify_Account, async (req, res) => {
   const { phone, ProfileImage } = req.body;
 
   try {

@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
 const orderRoutes = require('./routes/order');
 const ProductRoute = require('./routes/Product');
+const totalRoutes = require('./routes/total');
 dotenv.config();
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/Product', ProductRoute);
+app.use('/total', totalRoutes);
 
 mongoose.connect('mongodb+srv://zubairshayan70:KBW123@cluster0.unwex.mongodb.net/mydb')
   .then(() => console.log("Connected to MongoDB"))
