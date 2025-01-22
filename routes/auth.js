@@ -20,7 +20,14 @@ const verify_Account = (req, res, next) => {
     res.status(401).json({ message: 'Unauthorized access' });
   }
 };
-
+router.get('/getAll', async (req, res) => {
+  try {
+    const response = await User.find();
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -75,5 +82,6 @@ router.put('/update-profile', verify_Account, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 module.exports = router;
