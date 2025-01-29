@@ -20,6 +20,17 @@ const verify_Account = (req, res, next) => {
     res.status(401).json({ message: 'Unauthorized access' });
   }
 };
+router.get('/verify-token', verify_Account, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('-password'); // Exclude password from response
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+    res.status(200).json({ isValid: true, user });
+  } catch (error) {
+    res.status(401).json({ message: 'Unauthorized' });
+  }
+});
 router.get('/getAll', async (req, res) => {
   try {
     const response = await User.find();

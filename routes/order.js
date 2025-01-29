@@ -46,6 +46,30 @@ router.post('/checkout', verify_Account, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+router.put('/update-status/:orderId', verify_Account, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ success: false, message: 'Order status is required.' });
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Order status updated successfully', order: updatedOrder });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error. Please try again later.' });
+  }
+});
 
 router.get('/orders', verify_Account, async (req, res) => {
   try {
@@ -55,7 +79,7 @@ router.get('/orders', verify_Account, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-router.delete('/orders', verify_Account, async (req, res) => {
+router.delete('/delete', verify_Account, async (req, res) => {
   try {
     const { orderId } = req.body;
 
